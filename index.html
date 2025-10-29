@@ -84,6 +84,15 @@
         cursor: pointer;
         font-size: 0.8em;
     }
+    .cart-modify-button { /* NEW STYLE */
+        background-color: #007bff; /* Blue for modify */
+        color: white;
+        border: none;
+        padding: 5px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8em;
+    }
 
     /* Existing styles from previous versions */
     .section { margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
@@ -199,8 +208,75 @@
         cursor: wait;
     }
 
+    /* === MODAL STYLES === */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none; /* Hidden by default */
+        justify-content: center;
+        align-items: center;
+        z-index: 1050;
+    }
+    .modal-content {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        max-height: 90vh; 
+        overflow-y: auto; 
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    .modal-header h3 {
+        margin: 0;
+        color: #d9534f;
+    }
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #aaa;
+        padding: 0;
+        width: 30px;
+    }
+    .modification-group {
+        border: 1px solid #eee;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+    }
+    .modification-group label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+    .modification-group input[type="radio"], .modification-group select {
+        margin-right: 5px;
+    }
+    .modal-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    .modal-actions button {
+        width: auto;
+        flex: 1;
+    }
 
-    /* === PRINT STYLES FOR KITCHEN TICKET (58mm) === */
+    /* === PRINT STYLES FOR KITCHEN TICKET (58mm) - Clean Text Composition === */
     @media print {
         /* 1. Reset layout for receipt width (58mm) */
         body {
@@ -210,31 +286,20 @@
             color: black !important;
             background: white !important;
         }
+        @page { margin: 3mm; } /* Tighter margins for 58mm printer */
         
-        /* 2. Hide all non-kitchen elements */
-        .section, 
-        .order-interface, 
-        .menu-container, 
-        #printOrderButton,
-        #sendOrderButton,
-        #messageBox,
-        #userIdDisplay,
-        #paymentError,
-        #pwdWarning,
-        .amount-paid-buttons,
-        .status-bar, /* Hide the status bar when printing */
-        /* Hide all financial/payment/discount info */
+        /* 2. Hide everything in the main app, show only the print area */
+        #appRoot, 
+        .order-interface,
         .total, 
         .discount-line,
-        /* Hide all quantity inputs and price display elements */
-        .cart-table th:nth-child(4), .cart-table td:nth-child(4), /* Individual Price */
-        .cart-table th:nth-child(5), .cart-table td:nth-child(5) /* Line Total */
+        .section,
+        h1
         {
             display: none !important;
         }
-
-        /* 3. Force display of the relevant sections */
-        .cart-container {
+        
+        #printArea {
             display: block !important;
             box-shadow: none;
             padding: 0;
@@ -242,142 +307,23 @@
             max-height: none;
             overflow: visible;
         }
-        
-        .cart-table {
-            width: 100%;
-        }
-        
-        /* Show Order Type & Customer Name container */
-        .section:has(label[for="customerName"]),
-        .section:has(input[name="orderType"]) {
-            display: block !important;
-            padding: 0 0 10px 0 !important;
-            margin: 0 !important;
-            box-shadow: none;
-        }
 
-        /* Custom Header Styling (Burnt Diner) */
-        h1 {
+        /* 3. Style the hidden receipt div to look like a ticket */
+        #printArea .receipt {
             display: block !important;
-            font-family: 'Georgia', sans-serif; /* Fallback for Museo Moderno */
-            font-size: 12pt;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 5px;
-            color: black !important;
-        }
-
-        /* Styling for Item List */
-        .cart-table th, .cart-table td {
-            padding: 2px 0;
-            border-bottom: none; 
-            font-size: 10pt;
-        }
-        
-        /* Hide 'X' remove button column */
-        .cart-table th:nth-child(1), .cart-table td:nth-child(1) { display: none; } 
-        
-        /* Item Name and Note Formatting */
-        .cart-item-row strong { 
-            display: block; 
-            font-size: 11pt;
-            font-weight: bold;
-        }
-        .cart-item-row input[type="text"] {
-            border: none !important;
-            padding: 0;
-            margin: 0 0 5px 0;
-            width: 100% !important;
-            font-size: 10pt;
-            font-style: italic;
-            color: #555;
-            display: block;
-        }
-        .cart-item-row input[type="number"] {
-            display: none; /* Hide number input */
-        }
-        .cart-table th:nth-child(2), .cart-table td:nth-child(2) {
-             /* Qty column width is preserved for simplicity, we'll rely on text to show QTY */
-             text-align: left;
-        }
-        
-        /* Add a simple text representation of QTY instead of the input box */
-        .cart-item-row td:nth-child(2)::before {
-            content: attr(data-qty-value) "x";
-            font-weight: bold;
-            display: block;
-        }
-
-        /* Ensure Order Type and Customer Name labels are clean */
-        .section label[for="customerName"],
-        .section label:has(input[name="orderType"]) {
-            display: block !important;
-            font-size: 10pt;
-            font-weight: bold;
-            margin-bottom: 2px;
-            padding: 0;
-        }
-        
-        /* Ensure the Order Type and Customer Name values are printed */
-        .section input[type="text"],
-        .section input[type="radio"]:checked + label {
-            display: inline-block !important;
-            font-weight: normal;
-            font-size: 10pt;
-            border: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        /* Hide all radio buttons/checkboxes/inputs not in the cart */
-        input:not(.cart-item-row input),
-        .radio-group {
-            display: none !important;
+            width: 58mm; 
+            max-width: 58mm; 
+            min-width: 58mm;
+            padding: 4px 4px 6px;
+            color: #000; 
+            background: #fff;
+            font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 11px; 
+            line-height: 1.2;
+            white-space: pre-line; /* keeps the \n line breaks from JS */
         }
     }
-  /* === CLEAN RECEIPT TEMPLATE (non-destructive to UI) === */
-#printArea .receipt{
-  width:58mm; max-width:58mm; min-width:58mm;
-  padding:6px 6px 10px;
-  color:#000; background:#fff;
-  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
-  font-size:11px; line-height:1.35;
-}
-.rc-center{text-align:center}
-.rc-strong{font-weight:700}
-.rc-muted{color:#444}
-.rc-row{display:flex; justify-content:space-between; gap:10px}
-.rc-divider{border-top:1px dashed #000; margin:6px 0}
-.rc-items{margin-top:6px}
-.rc-item{margin:2px 0}
-.rc-item-header{display:flex; justify-content:space-between}
-.rc-item-name{max-width:34mm; word-wrap:break-word}
-.rc-note{margin-left:10px; color:#444; font-style:italic}
-
-@media print{
-  @page{ margin:4mm }
-  /* Only show the receipt during print */
-  #appRoot{ display:none !important; }
-  #printArea{ display:block !important; }
-}
-
-/* === MINIMAL KITCHEN TICKET (tight) === */
-#printArea .receipt{
-  width:58mm; max-width:58mm; min-width:58mm;
-  padding:4px 4px 6px;
-  color:#000; background:#fff;
-  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
-  font-size:11px; line-height:1.2;
-  white-space:pre-line; /* keep our \n line breaks */
-}
-.tk-line{ margin:0; padding:0; }
-@media print{
-  @page{ margin:3mm }
-  /* Only show the receipt during print */
-  #appRoot{ display:none !important; }
-  #printArea{ display:block !important; }
-}
-</style>
+  </style>
 </head>
 <body>
   <div id="appRoot">
@@ -396,6 +342,13 @@
     <label for="customerName">Customer Name</label>
     <input type="text" id="customerName" placeholder="Enter name" />
   </div>
+  
+  <div class="section">
+    <label for="callNumber">Call Number</label>
+    <select id="callNumber" style="padding: 10px; font-size: 1.1em; width: 100%; box-sizing: border-box;">
+        <option value="N/A">-- Select Call Number --</option>
+        </select>
+  </div>
 
   <div class="order-interface">
     
@@ -406,7 +359,7 @@
                 <tr>
                     <th style="width: 5%;">X</th>
                     <th style="width: 10%;">Qty</th>
-                    <th style="width: 40%;">Item/Note</th>
+                    <th style="width: 40%;">Item/Mod</th>
                     <th style="width: 15%;">Price</th>
                     <th style="width: 15%; text-align: right;">Total</th>
                 </tr>
@@ -457,10 +410,13 @@
     <input type="number" id="amountPaid" min="0" value="0" onchange="updateSubtotal()" />
     
     <div class="amount-paid-buttons">
+        <button onclick="appendAmount('exact')" style="background-color: #28a745;">Exact Amount</button>
         <button onclick="appendAmount(200)">₱200</button>
         <button onclick="appendAmount(300)">₱300</button>
         <button onclick="appendAmount(400)">₱400</button>
         <button onclick="appendAmount(500)">₱500</button>
+        <button onclick="appendAmount(600)">₱600</button>
+        <button onclick="appendAmount(700)">₱700</button>
         <button onclick="appendAmount(1000)">₱1000</button>
         <button onclick="appendAmount('clear')">Clear</button>
     </div>
@@ -473,7 +429,7 @@
     <div style="font-size: 0.8em; margin-bottom: 10px; color: #6c757d;">
       User ID: <span id="userIdDisplay">Initializing...</span>
     </div>
-    <button id="printOrderButton" onclick="printReceipt()" style="background: #337ab7; margin-bottom: 10px;">🖨️ Print Kitchen Ticket</button>
+    <button id="printOrderButton" onclick="printReceipt()" style="background: #337ab7; margin-bottom: 10px;">🖨️ Print Receipt & Kitchen Ticket</button>
     <button id="sendOrderButton" onclick="sendOrder()">📤 Send Order & Save</button>
   </div>
 
@@ -731,18 +687,18 @@
         syncButton.disabled = failCount > 0 || await getPendingOrders().length === 0;
     }
     
-    // --- POS Application Logic (Unchanged Menu/Calculations) ---
+    // --- POS Application Logic ---
 
     const menuSections = [
       {
         icon: "🍔",
         name: "Burgers",
         items: [
-          { code: "B1", name: "Single Burnt", price: 129 },
-          { code: "B2", name: "Double Burnt", price: 179 },
-          { code: "B3", name: "Single BLT", price: 159 },
-          { code: "B4", name: "Double BLT", price: 209 },
-          { code: "BU", name: "Upgrade", price: 69 }
+          { code: "B1", name: "Single Burnt", price: 129, isBurger: true },
+          { code: "B2", name: "Double Burnt", price: 179, isBurger: true },
+          { code: "B3", name: "Single BLT", price: 159, isBurger: true },
+          { code: "B4", name: "Double BLT", price: 209, isBurger: true },
+          { code: "BU", name: "Upgrade", price: 49, isBurger: false, isUpgrade: true } 
         ]
       },
       {
@@ -761,6 +717,18 @@
         ]
       },
       {
+        icon: "➕",
+        name: "Add-ons", 
+        items: [
+          { code: "AO1", name: "Waffles", price: 79 },
+          { code: "AO2", name: "Cheese", price: 15 },
+          { code: "AO3", name: "Bacon", price: 20 },
+          { code: "AO4", name: "Pickles", price: 10 },
+          { code: "AO5", name: "Onions", price: 5 },
+          { code: "AO6", name: "Hashbrown", price: 30 } // NEW: Hashbrown
+        ]
+      },
+      {
         icon: "🥤",
         name: "Milk Shakes",
         items: [
@@ -773,17 +741,35 @@
         icon: "🧊",
         name: "Drinks",
         items: [
-          { code: "D1", name: "House Blend Iced Tea", price: 35 },
-          { code: "D2", name: "Sodas", price: 25 }
+          { code: "D1", name: "House Blend Iced Tea", price: 35, isDrink: true },
+          { code: "D2", name: "Sodas", price: 25, isDrink: true }
         ]
       }
     ];
+    
+    // Burger modification options for the modal
+    const burgerModificationOptions = {
+        'Pickles': ['Default', 'On the side', 'Remove'],
+        'Onions': ['Default', 'On the side', 'Remove'],
+        'Tomato': ['Default', 'On the side', 'Remove'],
+        'Lettuce': ['Default', 'On the side', 'Remove'],
+        'Bacon': ['Default', 'On the side', 'Remove'],
+        'Cheese': ['Default', 'On the side', 'Remove'],
+        'Sauce': ['Default', 'On the side', 'Remove'],
+        'Buns': ['Default', 'On the side', 'Remove']
+    };
+    
+    // Drink modification options for the modal
+    const drinkModificationOptions = ['Iced Tea', 'Coke', 'Sprite', 'Royal'];
 
     // Combine all items into a map for quick lookup
     const menuItemsMap = new Map(menuSections.flatMap(section => section.items).map(item => [item.code, item]));
     
     // Global variable to track the unique ID for each cart item (for easy removal/update)
     let cartItemCounter = 0;
+    
+    // Global object to hold item modification data
+    const cartModifications = {};
 
 
     const subtotalDisplay = document.getElementById("subtotal");
@@ -796,7 +782,13 @@
     const amountPaidInput = document.getElementById("amountPaid");
     const orderCartBody = document.getElementById("orderCart");
     const emptyCartMessage = document.getElementById("emptyCartMessage");
-
+    // Modal elements
+    const modificationModal = document.getElementById("modificationModal");
+    const modalContent = document.getElementById("modalContent");
+    const modalHeader = document.getElementById("modalItemHeader");
+    const modalModificationsDiv = document.getElementById("modalModifications");
+    const modalFreeTextarea = document.getElementById("modalFreeText");
+    const callNumberSelect = document.getElementById("callNumber");
 
     // Helper function to show a temporary message
     function showMessage(msg, isError = false) {
@@ -811,10 +803,14 @@
       }, 3000);
     }
     
-    // Function to quickly set Amount Paid
+    // Function to quickly set Amount Paid (MODIFIED for 'exact')
     window.appendAmount = function(amount) {
         if (amount === 'clear') {
             amountPaidInput.value = 0;
+        } else if (amount === 'exact') {
+            // Use the Total after Discount amount for 'exact'
+            const total = parseFloat(document.getElementById("total").textContent);
+            amountPaidInput.value = total > 0 ? total : 0;
         } else {
             amountPaidInput.value = amount;
         }
@@ -823,24 +819,220 @@
 
     // Function to trigger browser print
     window.printReceipt = function() {
-        // Before printing, update the cart rows with the current quantity value 
+        const total = parseFloat(document.getElementById("total").textContent);
+        
+        if (total === 0) {
+            showMessage("Cart is empty. Cannot print receipt.", true);
+            return;
+        }
+        
+        // 1. Prepare item data for print (set attributes and notes for the print script)
         const cartRows = document.querySelectorAll(".cart-item-row");
         cartRows.forEach(row => {
             const uniqueId = row.getAttribute("data-item-id");
+            // Get current quantity and set it as an attribute for the script to use
             const qty = document.querySelector(`[data-input-id="qty-${uniqueId}"]`).value;
             row.children[1].setAttribute('data-qty-value', qty); 
+            
+            // Ensure the hidden input has the correct note content for the print script to pick up
+            const noteContent = document.querySelector(`[data-display-id="note-${uniqueId}"]`).textContent;
+            document.querySelector(`[data-print-note-id="note-${uniqueId}"]`).value = noteContent;
         });
         
-        window.print();
+        // 2. Trigger the original buildReceipt function in the global script block
+        if (window._origPrintReceipt) {
+            window._origPrintReceipt();
+        } else {
+            // Fallback for direct module access
+            console.warn("Using default print for unified ticket.");
+            window.print();
+        }
     }
     
-    // Function to add an item to the cart
+    // NEW: Function to display the modification modal
+    window.showModificationModal = function(uniqueId, itemCode) {
+        const item = menuItemsMap.get(itemCode);
+        if (!item) return;
+
+        // Store the unique ID being modified
+        modificationModal.setAttribute('data-modifying-id', uniqueId);
+        
+        // Load current modifications or initialize to default
+        const currentMods = cartModifications[uniqueId] || { options: {}, freeText: '' };
+        
+        modalHeader.textContent = `Modify: ${item.name} (${item.code})`;
+        modalModificationsDiv.innerHTML = '';
+        modalFreeTextarea.value = currentMods.freeText;
+        
+        // Check if the item is a Burger OR is the Upgrade item
+        const isBurgerOrUpgrade = item.isBurger || item.code === 'BU'; // Only BU gets burger mods for now
+        // Check if the item is a Drink OR is the Upgrade item
+        const isDrinkOrUpgrade = item.isDrink || item.isUpgrade;
+
+        if (isBurgerOrUpgrade) {
+            // Build Burger Modification UI
+            for (const key in burgerModificationOptions) {
+                const groupDiv = document.createElement('div');
+                groupDiv.classList.add('modification-group');
+                let html = `<label>${key}</label>`;
+                
+                burgerModificationOptions[key].forEach(option => {
+                    const optionKey = key.replace(/\s/g, ''); // e.g., 'Pickles'
+                    const isChecked = (currentMods.options[optionKey] || 'Default') === option;
+                    
+                    html += `
+                        <label>
+                            <input type="radio" 
+                                name="mod-${uniqueId}-${optionKey}" 
+                                value="${option}"
+                                ${isChecked ? 'checked' : ''}
+                            /> ${option}
+                        </label>
+                    `;
+                });
+                groupDiv.innerHTML = html;
+                modalModificationsDiv.appendChild(groupDiv);
+            }
+        }
+        
+        if (isDrinkOrUpgrade) {
+            // Build Drink Modification UI (Dropdown)
+            const groupDiv = document.createElement('div');
+            groupDiv.classList.add('modification-group');
+            let html = `<label>Drink Choice</label>`;
+            const currentChoice = currentMods.options['DrinkChoice'] || drinkModificationOptions[0]; // Default to first drink
+
+            html += `<select name="mod-${uniqueId}-DrinkChoice">`;
+            drinkModificationOptions.forEach(option => {
+                const isSelected = currentChoice === option;
+                html += `<option value="${option}" ${isSelected ? 'selected' : ''}>${option}</option>`;
+            });
+            html += `</select>`;
+            
+            groupDiv.innerHTML = html;
+            modalModificationsDiv.appendChild(groupDiv);
+        }
+
+        // Show/Hide structured mods based on whether any were generated
+        modalModificationsDiv.style.display = (isBurgerOrUpgrade || isDrinkOrUpgrade) ? 'block' : 'none';
+        
+        // Show the free text section always
+        document.getElementById('freeTextGroup').style.display = 'block';
+
+        modificationModal.style.display = 'flex';
+    }
+    
+    // NEW: Function to save the modifications from the modal
+    window.saveModifications = function() {
+        const uniqueId = modificationModal.getAttribute('data-modifying-id');
+        const itemRow = document.querySelector(`[data-item-id="${uniqueId}"]`);
+        if (!itemRow) return;
+        
+        const itemCode = itemRow.getAttribute('data-item-code');
+        const item = menuItemsMap.get(itemCode);
+        
+        const newMods = {
+            options: {},
+            freeText: modalFreeTextarea.value.trim()
+        };
+        
+        const isBurgerOrUpgrade = item.isBurger || item.code === 'BU'; // Only BU gets burger mods for now
+        const isDrinkOrUpgrade = item.isDrink || item.isUpgrade;
+
+        if (isBurgerOrUpgrade) {
+            // Collect radio button values
+            for (const key in burgerModificationOptions) {
+                const optionKey = key.replace(/\s/g, '');
+                const selectedEl = document.querySelector(`input[name="mod-${uniqueId}-${optionKey}"]:checked`);
+                newMods.options[optionKey] = selectedEl ? selectedEl.value : 'Default';
+            }
+        }
+        
+        if (isDrinkOrUpgrade) {
+             // Collect dropdown value
+            const selectEl = document.querySelector(`select[name="mod-${uniqueId}-DrinkChoice"]`);
+            if(selectEl) {
+                newMods.options['DrinkChoice'] = selectEl.value;
+            } else {
+                 // For BU/Drink items, if the dropdown wasn't displayed but should have been,
+                 // we must check if we need to initialize the DrinkChoice
+                 if ((item.isUpgrade || item.isDrink) && !newMods.options['DrinkChoice']) {
+                    newMods.options['DrinkChoice'] = drinkModificationOptions[0];
+                 }
+            }
+        }
+
+        // Save to global modifications object
+        cartModifications[uniqueId] = newMods;
+        
+        // Update the visible note on the cart row
+        updateCartNoteDisplay(uniqueId);
+        
+        modificationModal.style.display = 'none';
+    }
+    
+    // NEW: Function to update the note text on the cart row
+    function updateCartNoteDisplay(uniqueId) {
+        const mods = cartModifications[uniqueId];
+        const itemCode = document.querySelector(`[data-item-id="${uniqueId}"]`).getAttribute('data-item-code');
+        const item = menuItemsMap.get(itemCode);
+        const noteDisplayEl = document.querySelector(`[data-display-id="note-${uniqueId}"]`);
+        
+        if (!mods || !noteDisplayEl) return;
+        
+        let modNotes = [];
+        
+        const isBurgerOrUpgrade = item.isBurger || item.code === 'BU'; // Only BU gets burger mods for now
+        const isDrinkOrUpgrade = item.isDrink || item.isUpgrade;
+
+        if (isBurgerOrUpgrade) {
+            for (const key in mods.options) {
+                if (mods.options[key] !== 'Default') {
+                    modNotes.push(`${key}: ${mods.options[key]}`);
+                }
+            }
+        }
+        
+        if (isDrinkOrUpgrade && mods.options['DrinkChoice']) {
+             modNotes.push(`Drink Choice: ${mods.options['DrinkChoice']}`);
+        }
+
+        if (mods.freeText) {
+            modNotes.push(`Note: ${mods.freeText}`);
+        }
+        
+        const combinedNote = modNotes.join(' | ');
+        noteDisplayEl.textContent = combinedNote;
+        
+        // For print, we use a hidden element to store the modification string
+        const printNoteEl = document.querySelector(`[data-print-note-id="note-${uniqueId}"]`);
+        if (printNoteEl) {
+            printNoteEl.value = combinedNote;
+        }
+        
+        // Change button color if modifications exist
+        const modifyBtn = document.querySelector(`[onclick="showModificationModal('${uniqueId}', '${itemCode}')"]`);
+        if (modifyBtn) {
+            modifyBtn.style.backgroundColor = combinedNote ? '#28a745' : '#007bff'; // Green if modifed, Blue otherwise
+        }
+    }
+    
+    // Function to add an item to the cart (UPDATED: Handle BU/Upgrade default drink choice)
     window.addItemToCart = function(itemCode) {
         const item = menuItemsMap.get(itemCode);
         if (!item) return;
 
         cartItemCounter++;
         const uniqueId = `cart-${cartItemCounter}`;
+        
+        // Initialize modifications for this new item
+        cartModifications[uniqueId] = { options: {}, freeText: '' };
+        
+        // Set default drink choice if it's a drink or upgrade item
+        if (item.isDrink || item.isUpgrade) {
+            cartModifications[uniqueId].options['DrinkChoice'] = drinkModificationOptions[0]; // Default to Iced Tea
+        }
+
 
         const itemRow = document.createElement("tr");
         itemRow.classList.add("cart-item-row");
@@ -854,23 +1046,29 @@
                 <input type="number" min="1" value="1" onchange="updateSubtotal()" data-input-id="qty-${uniqueId}" />
             </td>
             <td>
-                <strong>${item.name} (${item.code})</strong><br>
-                <input type="text" placeholder="Note (e.g., No onions)" onchange="updateSubtotal()" data-input-id="note-${uniqueId}" />
+                <strong>${item.name} (${item.code})</strong>
+                <button class="cart-modify-button" onclick="showModificationModal('${uniqueId}', '${item.code}')">Modify</button>
+                <div data-display-id="note-${uniqueId}" style="font-size: 0.8em; color: #6c757d; margin-top: 5px;"></div>
+                <input type="hidden" data-print-note-id="note-${uniqueId}" value="" /> 
             </td>
             <td>₱${item.price}</td>
             <td style="text-align: right;">₱<span data-display-id="total-${uniqueId}">${item.price}</span></td>
         `;
 
         orderCartBody.appendChild(itemRow);
+        // Initial setup of display notes and button color (This will display the default Drink Choice for BU/D items)
+        updateCartNoteDisplay(uniqueId);
         updateCartDisplay(); 
         updateSubtotal();
     }
     
-    // Function to remove an item from the cart
+    // Function to remove an item from the cart (UPDATED: Remove from cartModifications)
     window.removeItemFromCart = function(uniqueId) {
         const itemRow = document.querySelector(`[data-item-id="${uniqueId}"]`);
         if (itemRow) {
             itemRow.remove();
+            // Remove the modification data as well
+            delete cartModifications[uniqueId]; 
             updateCartDisplay();
             updateSubtotal();
         }
@@ -886,9 +1084,9 @@
     }
 
 
-    // Function to calculate and update totals
+    // Function to calculate and update totals (FIXED LOGIC)
     window.updateSubtotal = function() {
-      let subtotal = 0;
+      let rawSubtotal = 0; // Total before discount
       let totalQty = 0;
       let discountAmount = 0;
       let highestItemTotal = 0;
@@ -907,7 +1105,7 @@
           return; 
       }
 
-      // 1. Calculate Subtotal, Total Quantity, and find Highest Priced Item Total
+      // 1. Calculate Raw Subtotal, Total Quantity, and find Highest Priced Item Total
       cartRows.forEach(row => {
         const uniqueId = row.getAttribute("data-item-id");
         const price = parseFloat(row.getAttribute("data-price"));
@@ -915,7 +1113,7 @@
         const qty = parseInt(document.querySelector(`[data-input-id="qty-${uniqueId}"]`).value) || 0;
         
         const lineTotal = price * qty;
-        subtotal += lineTotal;
+        rawSubtotal += lineTotal;
         totalQty += qty;
         
         if (lineTotal > highestItemTotal) {
@@ -928,7 +1126,7 @@
 
       // 2. Apply Discount Logic
       if (discountMethod === "WholeOrder") {
-        discountAmount = subtotal * 0.20;
+        discountAmount = rawSubtotal * 0.20;
         // Show warning if Whole Order Discount is applied with multiple items
         pwdWarning.style.display = totalQty > 1 ? "block" : "none";
       } else if (discountMethod === "HighestItem") {
@@ -941,23 +1139,25 @@
       
       // Round discount and calculate final total
       discountAmount = Math.round(discountAmount); 
-      let total = subtotal - discountAmount;
+      let finalTotal = rawSubtotal - discountAmount;
       
       // 3. Update Displays
-      subtotalDisplay.textContent = subtotal.toFixed(0);
+      // FIX: Set subtotalDisplay to the RAW Subtotal before discount
+      subtotalDisplay.textContent = rawSubtotal.toFixed(0);
       discountAppliedDisplay.textContent = discountAmount.toFixed(0);
-      totalDisplay.textContent = total.toFixed(0);
+      // Set totalDisplay to the FINAL Total after discount
+      totalDisplay.textContent = finalTotal.toFixed(0);
 
       const amountPaid = parseFloat(document.getElementById("amountPaid").value) || 0;
-      const change = amountPaid - total;
+      const change = amountPaid - finalTotal;
       changeDisplay.textContent = change >= 0 ? change.toFixed(0) : 0;
       paymentError.style.display = change < 0 ? "block" : "none";
       
       // Prevent order if payment is insufficient or total is zero (empty cart)
-      document.getElementById("sendOrderButton").disabled = change < 0 || total === 0;
+      document.getElementById("sendOrderButton").disabled = change < 0 || finalTotal === 0;
     }
 
-    // Function to send the order (UPDATED: Uses IndexedDB when offline)
+    // Function to send the order (UPDATED: Pulls Call Number)
     window.sendOrder = async function() {
       if (!currentUserId) {
         showMessage("System initializing. Please wait for authentication.", true);
@@ -971,6 +1171,7 @@
       }
 
       const customerName = document.getElementById("customerName").value.trim() || "N/A";
+      const callNumber = document.getElementById("callNumber").value; // Capture Call Number
       const orderType = document.querySelector('input[name="orderType"]:checked').value;
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
       const amountPaid = parseFloat(document.getElementById("amountPaid").value) || 0;
@@ -988,11 +1189,11 @@
         const itemPrice = parseFloat(row.getAttribute("data-price"));
         
         const qtyInput = document.querySelector(`[data-input-id="qty-${uniqueId}"]`);
-        const noteInput = document.querySelector(`[data-input-id="note-${uniqueId}"]`);
-        
         const qty = parseInt(qtyInput.value) || 0;
-        const note = noteInput.value.trim();
         const itemName = menuItemsMap.get(itemCode).name;
+        
+        // Get modifications from the global object
+        const itemModifications = cartModifications[uniqueId] || { options: {}, freeText: '' };
         
         if (qty > 0) {
             items.push({ 
@@ -1000,7 +1201,7 @@
                 name: itemName, 
                 qty, 
                 price: itemPrice,
-                note: note
+                modifications: itemModifications // Save the structured mods
             });
         }
       });
@@ -1017,6 +1218,7 @@
 
       const orderData = {
         customerName,
+        callNumber, // ADDED Call Number
         orderType,
         paymentMethod,
         amountPaid: amountPaid, 
@@ -1039,7 +1241,7 @@
             orderData.createdAt = serverTimestamp(); 
             await addDoc(orderCollectionRef, orderData);
             
-            showMessage(`✅ Order for ${customerName} saved successfully to Firestore!`, false);
+            showMessage(`✅ Order for ${customerName} (Call #${callNumber}) saved successfully to Firestore!`, false);
             saveSuccess = true;
         } catch (e) {
             console.error("Error adding document to Firestore. Falling back to offline save:", e);
@@ -1051,7 +1253,7 @@
         // OFFLINE: Save to IndexedDB
         saveSuccess = await saveOrderToIndexedDB(orderData);
         if (saveSuccess) {
-            showMessage(`✅ Order for ${customerName} saved locally. Sync when online!`, false);
+            showMessage(`✅ Order for ${customerName} (Call #${callNumber}) saved locally. Sync when online!`, false);
         } else {
             showMessage("❌ Failed to save order locally. Service unavailable.", true);
         }
@@ -1061,12 +1263,16 @@
           // Reset form on successful save (online or offline)
           document.getElementById("customerName").value = "";
           document.getElementById("amountPaid").value = "0";
+          document.getElementById("callNumber").value = "N/A"; // Reset Call Number
           document.querySelector('input[name="pwdDiscount"][value="None"]').checked = true; 
           document.querySelector('input[name="orderType"][value="Dine In"]').checked = true;
           document.querySelector('input[name="paymentMethod"][value="Cash"]').checked = true;
           
-          // Clear the cart
+          // Clear the cart and modifications
           orderCartBody.innerHTML = "";
+          for (const key in cartModifications) {
+              delete cartModifications[key];
+          }
           updateCartDisplay();
           updateSubtotal(); 
       }
@@ -1125,9 +1331,23 @@
         console.log("Menu Buttons initialized successfully.");
     }
 
+    // NEW: Function to populate Call Number Dropdown
+    function initializeCallNumberDropdown() {
+        const select = document.getElementById('callNumber');
+        if (!select) return;
+
+        for (let i = 1; i <= 30; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            select.appendChild(option);
+        }
+    }
+
     // Core app setup logic (excluding menu buttons)
     function initializeAppCore() {
         console.log("Starting POS App Core initialization.");
+        initializeCallNumberDropdown(); // Initialize new element
         updateCartDisplay();
         updateSubtotal();
         updateNetworkStatus(); 
@@ -1138,11 +1358,40 @@
     window.addEventListener('DOMContentLoaded', () => {
         initializeMenuButtons(); 
         initializeAppCore();
+        // Hide modal when clicking overlay
+        modificationModal.addEventListener('click', (e) => {
+            if (e.target === modificationModal) {
+                modificationModal.style.display = 'none';
+            }
+        });
     });
+    
+    // Expose closeModal for the close button
+    window.closeModal = function() {
+        modificationModal.style.display = 'none';
+    }
   </script>
   </div>
+  
+<div id="modificationModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalItemHeader">Modify Item</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="modalModifications">
+            </div>
+        <div id="freeTextGroup" class="modification-group">
+            <label for="modalFreeText">Additional/Unlisted Customization</label>
+            <textarea id="modalFreeText" rows="3" placeholder="e.g., Well-done patty, Extra crispy fries..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button style="background: #28a745;" onclick="saveModifications()">Save Modifications</button>
+            <button style="background: #aaa;" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
 
-  <!-- PRINT-ONLY AREA -->
   <div id="printArea" style="display:none">
     <div class="receipt" id="receipt"></div>
   </div>
@@ -1160,41 +1409,98 @@
     // Get inputs
     const rawName = (document.getElementById('customerName')?.value || 'Walk-in').trim();
     const name = rawName || 'Walk-in';
+    const callNumber = (document.getElementById('callNumber')?.value || 'N/A').toUpperCase(); 
     const orderType = ((document.querySelector('input[name="orderType"]:checked')||{}).value || 'Dine In').toUpperCase();
+    
+    // New required details
+    const restaurantName = document.getElementById('mainHeader').textContent.trim().toUpperCase();
+    const dateTime = new Date().toLocaleString();
+    const subtotal = document.getElementById('subtotal').textContent; // Raw Subtotal (Pre-Discount)
+    const discount = document.getElementById('discountApplied').textContent;
+    const total = document.getElementById('total').textContent; // Final Total (Post-Discount)
 
+    
     // Collect items
     const rows = Array.from(document.querySelectorAll('.cart-item-row')).map(row => {
       const id = row.getAttribute('data-item-id') || '';
-      const qtyEl = document.querySelector(`[data-input-id="qty-${id}"]`) || row.querySelector('input[type="number"]');
-      const noteEl = document.querySelector(`[data-input-id="note-${id}"]`) || row.parentElement?.querySelector(`[data-input-id="note-${id}"]`);
-
+      // Get the final note string from the hidden input (populated just before print)
+      const noteEl = document.querySelector(`[data-print-note-id="note-${id}"]`); 
+      
+      const qtyEl = document.querySelector(`[data-input-id="qty-${id}"]`);
       const qty = parseInt(qtyEl?.value || '0', 10);
+      
       // Extract name from <strong> but strip trailing " (CODE)"
       let nm = row.querySelector('td:nth-child(3) strong')?.textContent?.trim() || 'Item';
-      nm = nm.replace(/\s*\([A-Za-z0-9]+\)\s*$/, ''); // remove codes like (B1)
+      nm = nm.replace(/\s*\([A-Za-z0-9]+\)\s*$/, ''); 
+      
       const note = (noteEl?.value || '').trim();
       return { qty, name:nm, note };
     }).filter(x => x.qty > 0);
 
-    // Compose minimal ticket (tightest: no blank lines, uppercase labels)
+    // Compose final text output (Kitchen Ticket style with summary data)
     let lines = [];
+    
+    // --- Restaurant Header and Date/Time ---
+    lines.push(`\n${restaurantName}`);
+    lines.push(dateTime);
+    lines.push(`--------------------------------`);
+    
+    // --- Order Details ---
+    lines.push(`CALL NUMBER: ${callNumber}`); 
     lines.push(`CUSTOMER: ${name}`);
     lines.push(`ORDER TYPE: ${orderType}`);
-    // No blank line per user's choice
-
+    lines.push(`--------------------------------`);
+    
+    // --- Item List ---
     rows.forEach(r => {
-      const notePart = r.note ? ` • ${r.note}` : '';
+      const notePart = r.note ? ` | ${r.note}` : ''; 
       lines.push(`${r.qty} x ${r.name}${notePart}`);
     });
+    
+    lines.push(`--------------------------------`);
+    
+    // --- Financial Summary (using the now-correct values) ---
+    lines.push(`SUBTOTAL: ₱${subtotal}`);
+    if (parseFloat(discount) > 0) {
+        lines.push(`DISCOUNT: -₱${discount}`);
+    }
+    lines.push(`TOTAL: ₱${total}`);
+    lines.push(`--------------------------------`);
+    
+    receipt.textContent = lines.join('\n');
+    
+    // Ensure the receipt div is visible when printing
+    receipt.style.display = 'block';
 
-    receipt.textContent = lines.join('\n');}
+  }
 
   // Safely override after page scripts have defined the original function
   const onReady = () => {
+    // Store the original function body
     const orig = window.printReceipt;
     window._origPrintReceipt = orig;
+    
     window.printReceipt = function(){
-      try { buildReceipt(); } catch(e){ console.error('buildReceipt failed', e); }
+      try { 
+          // 1. Prepare item data attributes (for the old logic)
+          const cartRows = document.querySelectorAll(".cart-item-row");
+          cartRows.forEach(row => {
+              const uniqueId = row.getAttribute("data-item-id");
+              const qty = document.querySelector(`[data-input-id="qty-${uniqueId}"]`).value;
+              row.children[1].setAttribute('data-qty-value', qty); 
+              
+              // Ensure the hidden input has the correct note content for buildReceipt()
+              const noteContent = document.querySelector(`[data-display-id="note-${uniqueId}"]`).textContent;
+              document.querySelector(`[data-print-note-id="note-${uniqueId}"]`).value = noteContent;
+          });
+          
+          // 2. Build and set the content of the hidden print receipt div
+          buildReceipt(); 
+          
+      } catch(e){ 
+          console.error('Print setup failed', e); 
+      }
+      // 3. Trigger print (which will only show the styled #printArea)
       window.print();
     };
   };
